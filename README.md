@@ -91,7 +91,7 @@ This website/API may be abused by malware or fraud software. Please note, that a
 it is important to note that the website/API and the software itself is not malware or fraudelant software or part of a malware infection. The website/API
 only returns public IP addresses based on the requester's IP address. Best efforts to reduce potential abuse is made using available Cloudflare functionality. 
 
-If you have any questions, please contact me directly at abuse@ip.app.
+If you have any questions or abuse concerns, please email abuse@ip.app.
 
 This website/API is coded by SEO expert and ex-Google engineer [Fili](https://fili.com/?utm_source=ip.app) and is under constant development as improvements 
 are made over time.
