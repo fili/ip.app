@@ -1,8 +1,8 @@
 # IP.APP API
 
-An easy way to request the current IP address and without any ads, trackers, or weird requirements.
+A free and easy way to request your current IP address. Without any ads, trackers, or weird requirements.
 
-In addition to the `plain/text` response, this API also supports getting the IP address in a JSON and 
+In addition to the `plain/text` response, this API also supports getting the IP address in JSON and 
 [HTTP Headers](https://http.dev/headers?utm_source=ip.app) responses (e.g. using the [HEAD](https://http.dev/head?utm_source=ip.app) method).
 
 ## JSON
@@ -85,7 +85,7 @@ If you find this API useful and like to assist paying for domain renewal and dat
 
 **IMPORTANT: The website/API does not initiate any outbound HTTP or network requests of any kind and only responds to inbound requests made by external clients. 
 There is no active scanning, tracking, exploitation, or malware distribution occurring from ip.app. If you are seeing requests to ip.app from within your 
-network or systems, it means a client or device within your network or system has reached out to us — not the other way around.**
+network or systems, it means a client or device within your network or system has reached out to the API — not the other way around.**
 
 This website/API may be abused by malware or fraud software. Please note, that as this a service for everyone, I can not control how it is (ab)used. However,
 it is important to note that the website/API and the software itself is not malware or fraudelant software or part of a malware infection. The website/API
