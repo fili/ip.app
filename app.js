@@ -106,8 +106,8 @@ async function handleRequest(request) {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma: no-cache',
-        'Expires: 0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
         'X-Your-IP': clientIP,
         ...corsHeaders
       }
@@ -122,7 +122,7 @@ async function handleRequest(request) {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
-        'Expires': 0,
+        'Expires': '0',
         'X-Your-IP': clientIP,
         ...corsHeaders
       }
