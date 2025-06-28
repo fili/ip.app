@@ -1,4 +1,4 @@
-# ip.app API
+# IP.APP API
 
 An easy way to request the current IP address and without any ads, trackers, or weird requirements.
 
