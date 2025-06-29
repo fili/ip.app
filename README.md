@@ -2,7 +2,7 @@
 
 A free and easy way to request your current IP address. Without any ads, trackers, or weird requirements.
 
-In addition to the `plain/text` response, this API also supports getting the IP address in JSON and
+In addition to the `plain/text` response, this API also supports getting the IP address in [JSON](#json) format and in the
 [HTTP Headers](https://http.dev/headers?utm_source=ip.app) responses (e.g. using the [HEAD](https://http.dev/head?utm_source=ip.app) method).
 
 ## Usage
@@ -18,7 +18,7 @@ The following [cURL](https://curl.se) and [Python](https://python.org) (using th
 
 ### GET
 
-Returns plain text or JSON in HTTP response body.
+Returns `plain text` or [JSON](#json) in HTTP response body.
 
 #### cURL
 
@@ -34,7 +34,7 @@ requests.get('http://ip.app').text.strip()
 
 ### POST
 
-Returns plain text or JSON in HTTP response body. Any POST data submitted is ignored and disregarded.
+Returns `plain text` or [JSON](#json) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
 
 #### cURL
 
@@ -50,7 +50,7 @@ requests.post('http://ip.app').text.strip()
 
 ### HEAD
 
-No HTTP response body is returned, only HTTP headers are returned.
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned.
 
 #### cURL
 
@@ -118,14 +118,14 @@ Since the IP address is included in the [HTTP header](https://http.dev/headers?u
 
 ## Response Values
 
-The API returns one of the following response values across all formats (plain text, JSON, and HTTP header):
+The API returns one of the following response values across all formats (`plain text`, [JSON](#json), and [HTTP header](#x-request-ip-http-header)):
 
 - **IP Address**: The detected public IP address in IPv4 format (e.g., `1.1.1.1`) or IPv6 format (e.g., `2001:db8::1`)
 - **Unknown**: Returned as a fallback when no IP address is detected
 
 ## Status Codes
 
-The API returns the following HTTP status codes:
+The API returns the following [HTTP status codes](https://http.dev/status?utm_source=ip.app):
 
 | Status Code | Description |
 |-------------|-------------|
@@ -167,7 +167,7 @@ If you find this API useful and like to assist paying for domain renewal and dat
 
 ## Credits
 
-This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a HEAD or JSON response.
+This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a [HEAD](#x-request-ip-http-header) or [JSON](#json) response.
 
 ## License
 - Code: MIT License
