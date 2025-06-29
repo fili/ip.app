@@ -4,17 +4,17 @@ addEventListener('fetch', event => {
 
 function extractIPFromForwarded(forwardedHeader) {
   if (!forwardedHeader) return null
-  
+
   // Forwarded header format: "for=192.0.2.60;proto=http;by=203.0.113.43"
   // or: "for="[2001:db8:cafe::17]:4711""
   const forMatch = forwardedHeader.match(/for=([^;,\s]+)/)
   if (!forMatch) return null
-  
+
   let ip = forMatch[1]
-  
+
   // Remove quotes if present
   ip = ip.replace(/"/g, '')
-  
+
   // Handle IPv6 in brackets with port: [2001:db8::1]:8080 -> 2001:db8::1
   if (ip.startsWith('[') && ip.includes(']:')) {
     ip = ip.substring(1, ip.indexOf(']:'))
@@ -26,14 +26,14 @@ function extractIPFromForwarded(forwardedHeader) {
       ip = parts[0]
     }
   }
-  
+
   return ip
 }
 
 async function handleRequest(request) {
   // Parse the URL to get the pathname
   const url = new URL(request.url)
-  
+
   // Redirect /docs to GitHub README
   if (url.pathname === '/docs') {
     return new Response(null, {
@@ -44,7 +44,7 @@ async function handleRequest(request) {
       }
     })
   }
-  
+
   // Only serve IP on root path, everything else gets 404
   if (url.pathname !== '/') {
     return new Response('Not Found', {
@@ -55,31 +55,31 @@ async function handleRequest(request) {
       }
     })
   }
-  
+
   // Get the client's IP address from various headers
   const forwardedHeader = request.headers.get('Forwarded')
   const forwardedIP = extractIPFromForwarded(forwardedHeader)
-  
-  const clientIP = request.headers.get('CF-Connecting-IP') || 
+
+  const clientIP = request.headers.get('CF-Connecting-IP') ||
                    forwardedIP ||
                    request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
                    request.headers.get('X-Real-IP') ||
                    'Unknown'
-    
+
   // Check if client accepts JSON
   const acceptHeader = request.headers.get('Accept') || ''
-  const wantsJson = acceptHeader.includes('application/json') || 
+  const wantsJson = acceptHeader.includes('application/json') ||
                     acceptHeader.includes('*/json') ||
                     request.url.includes('json=1') ||
                     request.url.includes('format=json')
-  
+
   // Set CORS headers for cross-origin requests
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, HEAD',
     'Access-Control-Allow-Headers': 'Content-Type'
   }
-  
+
   // Only allow GET and POST methods
   if (!['GET', 'POST', 'HEAD'].includes(request.method)) {
     return new Response('Method not allowed. Use GET, POST, or HEAD.', {
@@ -91,16 +91,15 @@ async function handleRequest(request) {
       }
     })
   }
-  
+
   if (wantsJson) {
     // Return JSON response
     const jsonResponse = {
-      ip: clientIP,
-      timestamp: new Date().toISOString()
+      ip: clientIP
     }
-    
+
     const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse)
-    
+
     return new Response(responseBody, {
       status: 200,
       headers: {
@@ -115,7 +114,7 @@ async function handleRequest(request) {
   } else {
     // Return plain text response
     const responseBody = request.method === 'HEAD' ? null : (clientIP + '\n')
-    
+
     return new Response(responseBody, {
       status: 200,
       headers: {
