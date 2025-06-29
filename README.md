@@ -65,8 +65,7 @@ curl ip.app
 curl -X POST ip.app
 ```
 
-*Note: Since cURL does not need the URL to include the scheme, just using `ip.app` will work on most machines. However, if it doesn't, just add
-`http://` to the address.*
+*Note: Since cURL does not need the URL to include the scheme, just using `ip.app` will work on most machines. However, if it doesn't, just add `http://` to the address.*
 
 ## Response Values
 
@@ -95,7 +94,7 @@ The API accepts requests to the following paths:
 |------|-------------|
 | `/` | Main endpoint - returns IP address |
 | `/docs` | Redirects to the API documentation |
-| `/robots.txt` | Robots exclusion file, based on [robotstxt.com/ai](https://robotstxt.com/ai?utm_source=ip.app)
+| `/robots.txt` | Robots exclusion file, based on [robotstxt.com/ai](https://robotstxt.com/ai?utm_source=ip.app) |
 
 All other paths return a [404 status code](https://http.dev/404?utm_source=ip.app).
 
@@ -122,18 +121,12 @@ This API is inspired by [icanhazip](http://icanhazip.com), which operates in a s
 
 ## Disclaimer
 
-**IMPORTANT: The website/API does not initiate any outbound HTTP or network requests of any kind and only responds to inbound requests made by external clients.
-There is no active scanning, tracking, exploitation, or malware distribution occurring from ip.app. If you are seeing requests to ip.app from within your
-network or systems, it means a client or device within your network or system has reached out to the API — not the other way around.**
+**IMPORTANT: The website/API does not initiate any outbound HTTP or network requests of any kind and only responds to inbound requests made by external clients. There is no active scanning, tracking, exploitation, or malware distribution occurring from ip.app. If you are seeing requests to ip.app from within your network or systems, it means a client or device within your network or system has reached out to the API — not the other way around.**
 
-This website/API may be abused by malware or fraud software. Please note, that as this a service for everyone, I can not control how it is (ab)used. However,
-it is important to note that the website/API and the software itself is not malware or fraudelant software or part of a malware infection. The website/API
-only returns public IP addresses based on the requester's IP address. Best efforts to reduce potential abuse is made using available Cloudflare functionality.
+This website/API may be abused by malware or fraud software. Please note, that as this a service for everyone, I can not control how it is (ab)used. However, it is important to note that the website/API and the software itself is not malware or fraudelant software or part of a malware infection. The website/API only returns public IP addresses based on the requester's IP address. Best efforts to reduce potential abuse is made using available Cloudflare functionality.
 
-If you have any questions or abuse concerns, please email abuse@ip.app.
+If you have any questions or abuse concerns, please email [abuse@ip.app](mailto:abuse@ip.app).
 
-This website/API is coded by SEO expert and ex-Google engineer [Fili](https://fili.com/?utm_source=ip.app) and is under constant development as improvements
-are made over time.
+This website/API is coded by SEO expert and ex-Google engineer [Fili](https://fili.com/?utm_source=ip.app) and is under constant development as improvements are made over time.
 
-Bugs will happen. Despite best efforts to maintain the code base and data quality, no guarantees can or will be given. Data may be incomplete and/or
-errors may occur. This is a personal website and for-fun project. [Use at your own risk](https://fili.com/d/?utm_source=ip.app).
+Bugs will happen. Despite best efforts to maintain the code base and data quality, no guarantees can or will be given. Data may be incomplete and/or errors may occur. This is a personal website and for-fun project. [Use at your own risk](https://fili.com/d/?utm_source=ip.app).
