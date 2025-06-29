@@ -50,7 +50,7 @@ The following [cURL](https://curl.se?utm_source=ip.app) examples will return the
 ### HEAD
 
 ```bash
-curl -sI ip.app | grep -i "X-Request-IP" | cut -d' ' -f2
+curl -sI ip.app | grep -i "x-request-ip" | cut -d' ' -f2
 ```
 
 ### GET
