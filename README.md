@@ -29,16 +29,16 @@ The HTTP response body will be like:
 }
 ```
 
-#### IP API Response Fields
+### Response Fields
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `ip` | String | The public IP address of the requesting client | `"1.1.1.1"` |
+| `ip` | String | The public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected | `"1.1.1.1"`, `"2001:db8::1"`, `"Unknown"` |
 
 
 ## X-Your-IP HTTP Header
 
-The API returns with every HTTP request a `X-Your-IP` HTTP header, which includes the public IP address of the requesting client.
+The API returns with every HTTP request a `X-Your-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected.
 
 The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
@@ -68,9 +68,45 @@ curl -X POST ip.app
 *Note: Since cURL does not need the URL to include the scheme, just using `ip.app` will work on most machines. However, if it doesn't, just add
 `http://` to the address.*
 
-## Credits
+## Response Values
 
-This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a HEAD or JSON response.
+The API returns one of the following response values across all formats (plain text, JSON, and HTTP header):
+
+- **IP Address**: The detected public IP address in IPv4 format (e.g., `1.1.1.1`) or IPv6 format (e.g., `2001:db8::1`)
+- **Unknown**: Returned as a fallback when no IP address is detected
+
+## Status Codes
+
+The API returns the following HTTP status codes:
+
+| Status Code | Description |
+|-------------|-------------|
+| `200` | Successful request - IP address returned |
+| `301` | Redirect to documentation |
+| `404` | Not found - invalid endpoint |
+| `429` | Too many requests - rate limiting applied |
+| `1015` | Rate limiting - requests blocked due to rate limits |
+
+## Accepted Paths
+
+The API accepts requests to the following paths:
+
+| Path | Description |
+|------|-------------|
+| `/` | Main endpoint - returns IP address |
+| `/docs` | Redirects to the API documentation |
+| `/robots.txt` | Robots exclusion file, based on [robotstxt.com/ai](https://robotstxt.com/ai?utm_source=ip.app)
+
+All other paths return a [404 status code](https://http.dev/404?utm_source=ip.app).
+
+
+## Rate Limiting
+
+Rate limiting is enabled to ensure fair usage of the API. Requests exceeding the rate limit will receive a `429` or `1015` status code response.
+
+## Geographic Restrictions
+
+Certain countries are blocked from using this API due to historic abuse patterns. Users from these countries will not be able to access the service.
 
 ## Ideas, Questions, Suggestions
 
@@ -79,6 +115,10 @@ I want to thank you for your enthusiasm and request that you please create an [i
 ## Sponsoring
 
 If you find this API useful and like to assist paying for domain renewal and data traffic costs, please consider [sponsering this API](https://github.com/sponsors/fili).
+
+## Credits
+
+This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a HEAD or JSON response.
 
 ## Disclaimer
 
