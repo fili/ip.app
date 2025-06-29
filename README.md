@@ -5,6 +5,65 @@ A free and easy way to request your current IP address. Without any ads, tracker
 In addition to the `plain/text` response, this API also supports getting the IP address in JSON and
 [HTTP Headers](https://http.dev/headers?utm_source=ip.app) responses (e.g. using the [HEAD](https://http.dev/head?utm_source=ip.app) method).
 
+## Usage
+
+The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
+- [GET](https://http.dev/get?utm_source=ip.app)
+- [POST](https://http.dev/post?utm_source=ip.app)
+- [HEAD](https://http.dev/head?utm_source=ip.app)
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the IP address:
+
+> Note: Since cURL does not need the URL to include the scheme, just using `ip.app` will work on most machines. However, if it doesn't, just add `https://` to the address.
+
+### GET
+
+Returns plain text or JSON in HTTP response body.
+
+#### cURL
+
+```bash
+curl ip.app
+```
+
+#### Python
+
+```python
+requests.get('http://ip.app').text.strip()
+```
+
+### POST
+
+Returns plain text or JSON in HTTP response body. Any POST data submitted is ignored and disregarded.
+
+#### cURL
+
+```bash
+curl -X POST ip.app
+```
+
+#### Python
+
+```python
+requests.post('http://ip.app').text.strip()
+```
+
+### HEAD
+
+No HTTP response body is returned, only HTTP headers are returned.
+
+#### cURL
+
+```bash
+curl -sI ip.app | grep -i "x-request-ip" | cut -d' ' -f2
+```
+
+#### Python
+
+```python
+requests.head('http://ip.app').headers.get('X-Request-IP', 'Unknown')
+```
+
 ## JSON
 
 The API returns a JSON response when using query parameters `?format=json` or `?json=1`. For example:
@@ -14,7 +73,7 @@ https://ip.app/?format=json
 https://ip.app/?json=1
 ```
 
-The API also returns a JSON response when the [Accept](https://http.dev/accept?utm_source=ip.app) header contains either one of the following:
+The API also returns a JSON response when the [Accept](https://http.dev/accept?utm_source=ip.app) header contains either one of the following values:
 
 ```bash
 application/json
@@ -29,43 +88,33 @@ The HTTP response body will be like:
 }
 ```
 
-### Response Fields
+### JSON Response Fields
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
 | `ip` | String | The public IP address of the requesting client (IPv4 or IPv6), or `Unknown` when no IP address is detected | `1.1.1.1`, `2001:db8::1`, `Unknown` |
 
+### JSON examples
+
+Try the following examples:
+
+#### cURL
+
+```bash
+curl -s http://ip.app?format=json | grep -o '"ip":"[^"]*"' | cut -d'"' -f4
+```
+
+#### Python
+
+```python
+requests.get('http://ip.app', headers={'Accept': 'application/json'}).json()['ip']
+```
 
 ## X-Request-IP HTTP Header
 
 The API returns with every HTTP request a `X-Request-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or `Unknown` when no IP address is detected.
 
-The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
-- [GET](https://http.dev/get?utm_source=ip.app)
-- [POST](https://http.dev/post?utm_source=ip.app) - Any POST data submitted is ignored and disregarded.
-- [HEAD](https://http.dev/head?utm_source=ip.app) - No response body is returned, only HTTP headers are sent.
-
-The following [cURL](https://curl.se?utm_source=ip.app) examples will return the IP address:
-
-### HEAD
-
-```bash
-curl -sI ip.app | grep -i "x-request-ip" | cut -d' ' -f2
-```
-
-### GET
-
-```bash
-curl ip.app
-```
-
-### POST
-
-```bash
-curl -X POST ip.app
-```
-
-*Note: Since cURL does not need the URL to include the scheme, just using `ip.app` will work on most machines. However, if it doesn't, just add `http://` to the address.*
+Since the IP address is included in the [HTTP header](https://http.dev/headers?utm_source=ip.app), response, it can be efficiently retrieved using just a [HEAD](https://http.dev/head?utm_source=ip.app) request without needing to download the response body. This makes it particularly useful for applications that want to avoid the overhead of initiating a [GET](https://http.dev/get?utm_source=ip.app) request and downloading and reading the HTTP response body.
 
 ## Response Values
 
@@ -108,7 +157,7 @@ Rate limiting is enabled to ensure fair usage of the API. Requests exceeding the
 
 Certain countries are blocked from using this API due to historic abuse patterns. Users from these countries will not be able to access the service.
 
-## Ideas, Questions, Suggestions
+## Ideas / Questions / Suggestions
 
 I want to thank you for your enthusiasm and request that you please create an [issue](https://github.com/fili/ip.app/issues/new) in this repository.
 
