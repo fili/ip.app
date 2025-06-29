@@ -95,6 +95,7 @@ The API accepts requests to the following paths:
 | `/` | Main endpoint - returns IP address |
 | `/docs` | Redirects to the API documentation |
 | `/robots.txt` | Robots exclusion file, based on [robotstxt.com/ai](https://robotstxt.com/ai?utm_source=ip.app) |
+| `/favicon.ico` | Favicon icon |
 
 All other paths return a [404 status code](https://http.dev/404?utm_source=ip.app).
 

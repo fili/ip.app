@@ -71,6 +71,8 @@ DisallowAITraining: /
 Content-Usage: ai=n
 Allow: /`
 
+// Custom IP location favicon (SVG base64 encoded)
+const FAVICON_SVG = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMC4yMzQgMjAuMjM0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPgo8cGF0aCBmaWxsPSIjMDMwMTA0IiBkPSJNNi43NzYsNC43MmgxLjU0OXY2LjgyN0g2Ljc3NlY0LjcyeiBNMTEuNzUxLDQuNjY5Yy0wLjk0MiwwLTEuNjEsMC4wNjEtMi4wODcsMC4xNDN2Ni43MzVoMS41M1Y5LjEwNmMwLjE0MywwLjAyLDAuMzI0LDAuMDMxLDAuNTI3LDAuMDMxYzAuOTExLDAsMS42OTEtMC4yMjQsMi4yMTgtMC43MjFjMC40MDUtMC4zODYsMC42MjgtMC45NTIsMC42MjgtMS42MjFjMC0wLjY2OC0wLjI5NS0xLjIzNC0wLjcyOS0xLjU3OUMxMy4zODIsNC44NTEsMTIuNzAyLDQuNjY5LDExLjc1MSw0LjY2OXogTTExLjcwOSw3Ljk1Yy0wLjIyMiwwLTAuMzg1LTAuMDEtMC41MTYtMC4wNDFWNS44OTVjMC4xMTEtMC4wMywwLjMyNC0wLjA2MSwwLjYzOS0wLjA2MWMwLjc2OSwwLDEuMjA1LDAuMzc1LDEuMjA1LDEuMDAyQzEzLjAzNyw3LjUzNSwxMi41Myw3Ljk1LDExLjcwOSw3Ljk1eiBNMTAuMTE3LDBDNS41MjMsMCwxLjgsMy43MjMsMS44LDguMzE2czguMzE3LDExLjkxOCw4LjMxNywxMS45MThzOC4zMTctNy4zMjQsOC4zMTctMTEuOTE3UzE0LjcxMSwwLDEwLjExNywweiBNMTAuMTM4LDEzLjM3M2MtMy4wNSwwLTUuNTIyLTIuNDczLTUuNTIyLTUuNTI0YzAtMy4wNSwyLjQ3My01LjUyMiw1LjUyMi01LjUyMmMzLjA1MSwwLDUuNTIyLDIuNDczLDUuNTIyLDUuNTIyQzE1LjY2LDEwLjg5OSwxMy4xODgsMTMuMzczLDEwLjEzOCwxMy4zNzN6Ii8+Cjwvc3ZnPg=='
 
 function extractIPFromForwarded(forwardedHeader) {
   if (!forwardedHeader) return null
@@ -115,6 +117,19 @@ async function handleRequest(request) {
     })
   }
 
+  // Serve favicon.ico
+  if (url.pathname === '/favicon.ico') {
+    const svgContent = atob(FAVICON_SVG)
+
+    return new Response(svgContent, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=86400' // Cache for 24 hours
+      }
+    })
+  }
+
   // Serve robots.txt
   if (url.pathname === '/robots.txt') {
     return new Response(ROBOTS_TXT, {
@@ -126,7 +141,7 @@ async function handleRequest(request) {
     })
   }
 
-  // Only serve IP on root path, everything else gets 404
+  // Only serve IP on root path, remaining paths get 404
   if (url.pathname !== '/') {
     return new Response('Not Found', {
       status: 404,
