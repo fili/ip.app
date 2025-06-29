@@ -33,12 +33,12 @@ The HTTP response body will be like:
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `ip` | String | The public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected | `"1.1.1.1"`, `"2001:db8::1"`, `"Unknown"` |
+| `ip` | String | The public IP address of the requesting client (IPv4 or IPv6), or `Unknown` when no IP address is detected | `1.1.1.1`, `2001:db8::1`, `Unknown` |
 
 
 ## X-Request-IP HTTP Header
 
-The API returns with every HTTP request a `X-Request-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected.
+The API returns with every HTTP request a `X-Request-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or `Unknown` when no IP address is detected.
 
 The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
