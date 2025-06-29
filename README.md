@@ -43,7 +43,7 @@ The API returns with every HTTP request a `X-Request-IP` HTTP header, which incl
 The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
 - [POST](https://http.dev/post?utm_source=ip.app) - Any POST data submitted is ignored and disregarded.
-- [HEAD](https://http.dev/head?utm_source=ip.app)
+- [HEAD](https://http.dev/head?utm_source=ip.app) - No response body is returned, only HTTP headers are sent.
 
 The following [cURL](https://curl.se?utm_source=ip.app) examples will return the IP address:
 
