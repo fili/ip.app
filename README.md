@@ -116,6 +116,8 @@ The API returns with every HTTP request a `X-Request-IP` HTTP header, which incl
 
 Since the IP address is included in the [HTTP header](https://http.dev/headers?utm_source=ip.app), response, it can be efficiently retrieved using just a [HEAD](https://http.dev/head?utm_source=ip.app) request without needing to download the response body. This makes it particularly useful for applications that want to avoid the overhead of initiating a [GET](https://http.dev/get?utm_source=ip.app) request and downloading and reading the HTTP response body.
 
+For examples, check out the [HEAD](#head) examples under [Usage](#usage).
+
 ## Response Values
 
 The API returns one of the following response values across all formats (`plain text`, [JSON](#json), and [HTTP header](#x-request-ip-http-header)):
