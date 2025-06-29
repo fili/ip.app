@@ -36,9 +36,9 @@ The HTTP response body will be like:
 | `ip` | String | The public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected | `"1.1.1.1"`, `"2001:db8::1"`, `"Unknown"` |
 
 
-## X-Your-IP HTTP Header
+## X-Request-IP HTTP Header
 
-The API returns with every HTTP request a `X-Your-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected.
+The API returns with every HTTP request a `X-Request-IP` HTTP header, which includes the public IP address of the requesting client (IPv4 or IPv6), or "Unknown" when no IP address is detected.
 
 The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
@@ -50,7 +50,7 @@ The following [cURL](https://curl.se?utm_source=ip.app) examples will return the
 ### HEAD
 
 ```bash
-curl -sI ip.app | grep -i "x-your-ip" | cut -d' ' -f2
+curl -sI ip.app | grep -i "X-Request-IP" | cut -d' ' -f2
 ```
 
 ### GET

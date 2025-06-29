@@ -188,7 +188,7 @@ async function handleRequest(request) {
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
         'Expires': '0',
-        'X-Your-IP': clientIP,
+        'X-Request-IP': clientIP,
         ...corsHeaders
       }
     })
@@ -203,7 +203,7 @@ async function handleRequest(request) {
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
         'Expires': '0',
-        'X-Your-IP': clientIP,
+        'X-Request-IP': clientIP,
         ...corsHeaders
       }
     })
