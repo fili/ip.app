@@ -120,6 +120,10 @@ If you find this API useful and like to assist paying for domain renewal and dat
 
 This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a HEAD or JSON response.
 
+## License
+- Code: MIT License
+- Favicon (decoded): CC0 Public Domain
+
 ## Disclaimer
 
 **IMPORTANT: The website/API does not initiate any outbound HTTP or network requests of any kind and only responds to inbound requests made by external clients. There is no active scanning, tracking, exploitation, or malware distribution occurring from ip.app. If you are seeing requests to ip.app from within your network or systems, it means a client or device within your network or system has reached out to the API — not the other way around.**

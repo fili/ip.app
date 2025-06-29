@@ -117,7 +117,7 @@ async function handleRequest(request) {
     })
   }
 
-  // Serve favicon.ico
+  // Serve favicon.ico (CC0 Public Domain)
   if (url.pathname === '/favicon.ico') {
     const svgContent = atob(FAVICON_SVG)
 
