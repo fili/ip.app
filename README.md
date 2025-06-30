@@ -71,8 +71,8 @@ requests.head('https://ip.app').headers.get('X-Request-IP', 'Unknown')
 The API returns a JSON response when using query parameters `?format=json` or `?json=1`. For example:
 
 ```bash
-https://ip.app/?format=json
-https://ip.app/?json=1
+https://ip.app?format=json
+https://ip.app?json=1
 ```
 
 The API also returns a JSON response when the [Accept](https://http.dev/accept?utm_source=ip.app) header contains either one of the following values:
@@ -102,14 +102,31 @@ Try the following examples:
 
 #### cURL
 
+Using the query parameter `?format=json`:
+
 ```bash
 curl -s https://ip.app?format=json | grep -o '"ip":"[^"]*"' | cut -d'"' -f4
 ```
 
+Using the `Accept` header:
+
+```bash
+curl -s -H "Accept: application/json" https://ip.app | grep -o '"ip":"[^"]*"' | cut -d'"' -f4
+```
+
+
 #### Python
 
+Using the query parameter `?json=1`:
+
 ```python
-requests.get('https://ip.app', headers={'Accept': 'application/json'}).json()['ip']
+requests.get('https://ip.app?json=1').json().get('ip', 'Unknown')
+```
+
+Using the `Accept` header:
+
+```python
+requests.get('https://ip.app', headers={'Accept': 'application/json'}).json().get('ip', 'Unknown')
 ```
 
 ## X-Request-IP HTTP Header
