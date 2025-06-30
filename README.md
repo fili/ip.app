@@ -31,7 +31,7 @@ curl ip.app
 #### Python
 
 ```python
-requests.get('http://ip.app').text.strip()
+requests.get('https://ip.app').text.strip()
 ```
 
 ### POST
@@ -47,7 +47,7 @@ curl -X POST ip.app
 #### Python
 
 ```python
-requests.post('http://ip.app').text.strip()
+requests.post('https://ip.app').text.strip()
 ```
 
 ### HEAD
@@ -63,7 +63,7 @@ curl -sI ip.app | grep -i "x-request-ip" | cut -d' ' -f2
 #### Python
 
 ```python
-requests.head('http://ip.app').headers.get('X-Request-IP', 'Unknown')
+requests.head('https://ip.app').headers.get('X-Request-IP', 'Unknown')
 ```
 
 ## JSON
@@ -103,13 +103,13 @@ Try the following examples:
 #### cURL
 
 ```bash
-curl -s http://ip.app?format=json | grep -o '"ip":"[^"]*"' | cut -d'"' -f4
+curl -s https://ip.app?format=json | grep -o '"ip":"[^"]*"' | cut -d'"' -f4
 ```
 
 #### Python
 
 ```python
-requests.get('http://ip.app', headers={'Accept': 'application/json'}).json()['ip']
+requests.get('https://ip.app', headers={'Accept': 'application/json'}).json()['ip']
 ```
 
 ## X-Request-IP HTTP Header
@@ -171,7 +171,7 @@ If you find this API useful and like to assist paying for domain renewal and dat
 
 ## Credits
 
-This API is inspired by [icanhazip](http://icanhazip.com), which operates in a similar way but does not support IP reporting in a [HEAD](#x-request-ip-http-header) or [JSON](#json) response.
+This API is inspired by [icanhazip](https://icanhazip.com), which operates in a similar way but does not support IP reporting in a [HEAD](#x-request-ip-http-header) or [JSON](#json) response.
 
 ## License
 - Code: MIT License
