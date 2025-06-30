@@ -219,6 +219,7 @@ async function handleRequest(request) {
         'Pragma': 'no-cache',
         'Expires': '0',
         'X-Request-IP': clientIP,
+        'Link': '<https://github.com/fili/ip.app>; rel="canonical"',
         ...corsHeaders
       }
     })
