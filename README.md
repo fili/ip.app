@@ -5,6 +5,8 @@ A free and easy way to request your current IP address. Without any ads, tracker
 In addition to the `plain/text` response, this API also supports getting the IP address in [JSON](#json) format and in the
 [HTTP Headers](https://http.dev/headers?utm_source=ip.app) responses (e.g. using the [HEAD](https://http.dev/head?utm_source=ip.app) method).
 
+[![IP.APP API - Free easy to use API to check your IP address | Product Hunt](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=985169&theme=neutral&t=1751270589029)](https://www.producthunt.com/products/ip-app-api)
+
 ## Usage
 
 The API supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
