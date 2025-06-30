@@ -1,6 +1,6 @@
 # IP.APP API
 
-A free and easy way to request your current IP address. Without any ads, trackers, or weird requirements.
+A free and easy way to check your current IP address. Without any ads, trackers, or weird requirements.
 
 In addition to the `plain/text` response, this API also supports getting the IP address in [JSON](#json) format and in the
 [HTTP Headers](https://http.dev/headers?utm_source=ip.app) responses (e.g. using the [HEAD](https://http.dev/head?utm_source=ip.app) method).
@@ -178,9 +178,13 @@ Rate limiting is enabled to ensure fair usage of the API. Requests exceeding the
 
 Certain countries are blocked from using this API due to historic abuse patterns. Users from these countries will not be able to access the service.
 
+## Status Updates
+
+Any news and/or status updates will be published on BlueSky: [@ip.app](https://bsky.app/profile/ip.app)
+
 ## Ideas / Questions / Suggestions
 
-I want to thank you for your enthusiasm and request that you please create an [issue](https://github.com/fili/ip.app/issues/new) in this repository.
+Thank you for your enthusiasm, please create an [issue](https://github.com/fili/ip.app/issues/new) in this repository.
 
 ## Sponsoring
 
