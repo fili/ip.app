@@ -74,6 +74,10 @@ Allow: /`
 // Custom IP location favicon (SVG base64 encoded)
 const FAVICON_SVG = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMC4yMzQgMjAuMjM0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPgo8cGF0aCBmaWxsPSIjMDMwMTA0IiBkPSJNNi43NzYsNC43MmgxLjU0OXY2LjgyN0g2Ljc3NlY0LjcyeiBNMTEuNzUxLDQuNjY5Yy0wLjk0MiwwLTEuNjEsMC4wNjEtMi4wODcsMC4xNDN2Ni43MzVoMS41M1Y5LjEwNmMwLjE0MywwLjAyLDAuMzI0LDAuMDMxLDAuNTI3LDAuMDMxYzAuOTExLDAsMS42OTEtMC4yMjQsMi4yMTgtMC43MjFjMC40MDUtMC4zODYsMC42MjgtMC45NTIsMC42MjgtMS42MjFjMC0wLjY2OC0wLjI5NS0xLjIzNC0wLjcyOS0xLjU3OUMxMy4zODIsNC44NTEsMTIuNzAyLDQuNjY5LDExLjc1MSw0LjY2OXogTTExLjcwOSw3Ljk1Yy0wLjIyMiwwLTAuMzg1LTAuMDEtMC41MTYtMC4wNDFWNS44OTVjMC4xMTEtMC4wMywwLjMyNC0wLjA2MSwwLjYzOS0wLjA2MWMwLjc2OSwwLDEuMjA1LDAuMzc1LDEuMjA1LDEuMDAyQzEzLjAzNyw3LjUzNSwxMi41Myw3Ljk1LDExLjcwOSw3Ljk1eiBNMTAuMTE3LDBDNS41MjMsMCwxLjgsMy43MjMsMS44LDguMzE2czguMzE3LDExLjkxOCw4LjMxNywxMS45MThzOC4zMTctNy4zMjQsOC4zMTctMTEuOTE3UzE0LjcxMSwwLDEwLjExNywweiBNMTAuMTM4LDEzLjM3M2MtMy4wNSwwLTUuNTIyLTIuNDczLTUuNTIyLTUuNTI0YzAtMy4wNSwyLjQ3My01LjUyMiw1LjUyMi01LjUyMmMzLjA1MSwwLDUuNTIyLDIuNDczLDUuNTIyLDUuNTIyQzE1LjY2LDEwLjg5OSwxMy4xODgsMTMuMzczLDEwLjEzOCwxMy4zNzN6Ii8+Cjwvc3ZnPg=='
 
+// IP version constants
+const _IP_VERSION_IPV6 = 'ipv6'
+const _IP_VERSION_IPV4 = 'ipv4'
+
 // Common CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -111,7 +115,7 @@ function extractIPFromForwarded(forwardedHeader) {
     ip = ip.substring(1, ip.indexOf(']:'))
   }
   // Handle IPv4 with port: 192.168.1.1:8080 -> 192.168.1.1
-  else if (ip.includes(':') && !ip.includes('::')) {
+  else if (ip.includes('.') && ip.includes(':') && !ip.includes('::')) {
     const parts = ip.split(':')
     if (parts.length === 2 && /^\d+$/.test(parts[1])) {
       ip = parts[0]
@@ -145,7 +149,7 @@ function isJsonRequested(request) {
 // Handle IP request
 async function handleIPRequest(request) {
   const clientIP = getClientIP(request)
-  const ipVersion = clientIP.includes(':') ? 'ipv6' : (clientIP.includes('.') ? 'ipv4' : '')
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
   const wantsJson = isJsonRequested(request)
 
   if (wantsJson) {
@@ -230,7 +234,7 @@ async function handleHeadersRequest(request) {
 
   const wantsJson = isJsonRequested(request)
   const clientIP = getClientIP(request)
-  const ipVersion = clientIP.includes(':') ? 'ipv6' : (clientIP.includes('.') ? 'ipv4' : '')
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
 
   if (wantsJson) {
     const responseBody = request.method === 'HEAD' ? null : JSON.stringify(headers, null, 2) + '\n'
@@ -271,11 +275,11 @@ async function handleHeadersRequest(request) {
 
 // Handle ASN request
 async function handleASNRequest(request) {
-  const asn = request.cf?.asn || 'Unknown'
-  const asOrganization = request.cf?.asOrganization || 'Unknown'
+  const asn = request.cf?.asn || ''
+  const asOrganization = request.cf?.asOrganization || ''
   const wantsJson = isJsonRequested(request)
   const clientIP = getClientIP(request)
-  const ipVersion = clientIP.includes(':') ? 'ipv6' : (clientIP.includes('.') ? 'ipv4' : '')
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
 
   if (wantsJson) {
     const jsonResponse = {
@@ -297,7 +301,7 @@ async function handleASNRequest(request) {
       }
     })
   } else {
-    const asnText = `AS${asn} ${asOrganization}`
+    const asnText = `AS${asn}: ${asOrganization}`
     const responseBody = request.method === 'HEAD' ? null : (asnText + '\n')
 
     return new Response(responseBody, {

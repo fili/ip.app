@@ -15,8 +15,10 @@ The API accepts requests to the following paths:
 
 | Path | Name | Description |
 |------|------|-------------|
-| `/` | IP address | Endpoint for returning your current IP address |
-| `/headers` |  HTTP headers | Endpoint for returning HTTP headers your client sent to the server |
+| `/` | IP address | Endpoint for returning the current IP address |
+| `/headers` |  HTTP headers | Endpoint for returning HTTP headers the client sent to the server |
+| `/asn` | ASN | Endpoint for returning the ASN of the current IP address |
+
 
 The API endpoints supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
@@ -248,6 +250,82 @@ The API endpoint `/headers` returns one of the following response values across 
 
 - **Key: Value pairs**: representing the HTTP headers the requesting client sent to the server.
 - **Empty Response**: An empty response or `{}` as no headers were sent.
+
+### Endpoint: ASN
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the ASN of the current IP address.
+
+#### GET
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body.
+
+##### cURL
+
+```bash
+curl ip.app/asn
+```
+
+##### Python
+
+```python
+requests.get('https://ip.app/asn').text
+```
+
+##### wget
+
+```bash
+wget -qO- ip.app/asn
+```
+
+#### POST
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
+
+##### cURL
+
+```bash
+curl -X POST ip.app/asn
+```
+
+##### Python
+
+```python
+requests.post('https://ip.app/asn').text
+```
+
+#### HEAD
+
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned. All HTTP headers sent by the requesting client (e.g. your browser) are returned alongside the HTTP server response headers, however the names of the client's HTTP headers start with `x-ipapp-`.
+
+##### cURL
+
+Read the ASN in HEAD response and extract only the request headers:
+
+```bash
+curl -sI ip.app/asn | grep -i "x-ipapp-asn"
+```
+
+Removing the `x-ipapp-asn-` prefix:
+
+```bash
+curl -sI ip.app/asn | grep -i "x-ipapp-asn-" | sed 's/x-ipapp-asn-//i'
+```
+
+##### Python
+
+Read the ASN in HEAD response, extract only the relevant request headers:
+
+```python
+requests.head('https://ip.app/asn').headers.get('x-ipapp-asn', '')
+```
+
+#### Response Values
+
+The API endpoint `/asn` returns one of the following response values across the formats `plain text` and [JSON](#json):
+
+- **Key: Value pairs**: representing the ASN of the current IP address. Where the key is the ASN number, starting with `AS` and the value is the ASN organization name, separated by a colon and a space `: `.
+- **Empty Response**: An empty response or `{}` as no ASN was found.
+
 
 ## JSON
 
