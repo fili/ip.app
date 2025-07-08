@@ -75,8 +75,8 @@ Allow: /`
 const FAVICON_SVG = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMC4yMzQgMjAuMjM0IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPgo8cGF0aCBmaWxsPSIjMDMwMTA0IiBkPSJNNi43NzYsNC43MmgxLjU0OXY2LjgyN0g2Ljc3NlY0LjcyeiBNMTEuNzUxLDQuNjY5Yy0wLjk0MiwwLTEuNjEsMC4wNjEtMi4wODcsMC4xNDN2Ni43MzVoMS41M1Y5LjEwNmMwLjE0MywwLjAyLDAuMzI0LDAuMDMxLDAuNTI3LDAuMDMxYzAuOTExLDAsMS42OTEtMC4yMjQsMi4yMTgtMC43MjFjMC40MDUtMC4zODYsMC42MjgtMC45NTIsMC42MjgtMS42MjFjMC0wLjY2OC0wLjI5NS0xLjIzNC0wLjcyOS0xLjU3OUMxMy4zODIsNC44NTEsMTIuNzAyLDQuNjY5LDExLjc1MSw0LjY2OXogTTExLjcwOSw3Ljk1Yy0wLjIyMiwwLTAuMzg1LTAuMDEtMC41MTYtMC4wNDFWNS44OTVjMC4xMTEtMC4wMywwLjMyNC0wLjA2MSwwLjYzOS0wLjA2MWMwLjc2OSwwLDEuMjA1LDAuMzc1LDEuMjA1LDEuMDAyQzEzLjAzNyw3LjUzNSwxMi41Myw3Ljk1LDExLjcwOSw3Ljk1eiBNMTAuMTE3LDBDNS41MjMsMCwxLjgsMy43MjMsMS44LDguMzE2czguMzE3LDExLjkxOCw4LjMxNywxMS45MThzOC4zMTctNy4zMjQsOC4zMTctMTEuOTE3UzE0LjcxMSwwLDEwLjExNywweiBNMTAuMTM4LDEzLjM3M2MtMy4wNSwwLTUuNTIyLTIuNDczLTUuNTIyLTUuNTI0YzAtMy4wNSwyLjQ3My01LjUyMiw1LjUyMi01LjUyMmMzLjA1MSwwLDUuNTIyLDIuNDczLDUuNTIyLDUuNTIyQzE1LjY2LDEwLjg5OSwxMy4xODgsMTMuMzczLDEwLjEzOCwxMy4zNzN6Ii8+Cjwvc3ZnPg=='
 
 // IP version constants
-const _IP_VERSION_IPV6 = 'ipv6'
-const _IP_VERSION_IPV4 = 'ipv4'
+const _IP_VERSION_IPV6 = '6'
+const _IP_VERSION_IPV4 = '4'
 
 // Common CORS headers
 const corsHeaders = {
@@ -133,7 +133,7 @@ function getClientIP(request) {
     forwardedIP ||
     request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
     request.headers.get('X-Real-IP') ||
-    'Unknown'
+    ''
 }
 
 function isJsonRequested(request) {
@@ -178,6 +178,58 @@ async function handleIPRequest(request) {
         'x-ipapp-ip': clientIP,
         'x-ipapp-ip-version': ipVersion,
         'x-request-ip': clientIP,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  }
+}
+
+// Handle ASN request
+async function handleASNRequest(request) {
+  const asn = request.cf?.asn || ''
+  const asOrganization = request.cf?.asOrganization || ''
+  const wantsJson = isJsonRequested(request)
+  const clientIP = getClientIP(request)
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
+
+  if (wantsJson) {
+    let jsonResponse = {}
+    if (asn) {
+      jsonResponse.asn = `AS${asn}`
+    }
+    if (asOrganization) {
+      jsonResponse.organization = asOrganization
+    }
+    const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-asn': asn ? `AS${asn}` : '',
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  } else {
+    let asnText = asn ? `AS${asn.toString()}` : ''
+    if (asOrganization) {
+      asnText += `: ${asOrganization}`
+    }
+    const responseBody = request.method === 'HEAD' ? null : (asnText + '\n')
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-asn': asn ? `AS${asn}` : '',
         ...corsHeaders,
         ...cacheBustingHeaders,
         ...documentationHeader
@@ -273,18 +325,33 @@ async function handleHeadersRequest(request) {
   }
 }
 
-// Handle ASN request
-async function handleASNRequest(request) {
-  const asn = request.cf?.asn || ''
-  const asOrganization = request.cf?.asOrganization || ''
+// Handle location request
+async function handleLocationRequest(request) {
+  const latitude = request.cf?.latitude || ''
+  const longitude = request.cf?.longitude || ''
+  const city = request.cf?.city || ''
+  const region = request.cf?.region || ''
+  const regionCode = request.cf?.regionCode || ''
+  const country = request.cf?.country || ''
+  const postalCode = request.cf?.postalCode || ''
+  const continent = request.cf?.continent || ''
+  const isEUCountry = request.cf?.isEUCountry || false
+
   const wantsJson = isJsonRequested(request)
   const clientIP = getClientIP(request)
   const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
 
   if (wantsJson) {
     const jsonResponse = {
-      asn: asn,
-      organization: asOrganization
+      latitude: latitude,
+      longitude: longitude,
+      city: city,
+      region: region,
+      region_code: regionCode,
+      country: country,
+      postal_code: postalCode,
+      continent: continent,
+      is_eu_country: isEUCountry
     }
     const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
 
@@ -294,15 +361,23 @@ async function handleASNRequest(request) {
         'Content-Type': 'application/json',
         'x-ipapp-ip': clientIP,
         'x-ipapp-ip-version': ipVersion,
-        'x-ipapp-asn': asn.toString(),
+        'x-ipapp-loc-latitude': latitude.toString(),
+        'x-ipapp-loc-longitude': longitude.toString(),
+        'x-ipapp-loc-city': city,
+        'x-ipapp-loc-region': region,
+        'x-ipapp-loc-country': country,
+        'x-ipapp-loc-postal_code': postalCode,
+        'x-ipapp-loc-continent': continent,
+        'x-ipapp-loc-is_eu_country': isEUCountry,
         ...corsHeaders,
         ...cacheBustingHeaders,
         ...documentationHeader
       }
     })
   } else {
-    const asnText = `AS${asn}: ${asOrganization}`
-    const responseBody = request.method === 'HEAD' ? null : (asnText + '\n')
+    // Plain text format: "City, Region, Country (lat, lng)"
+    const locationText = `city: ${city}\nregion: ${region}\ncountry: ${country}\npostal_code: ${postalCode}\ncontinent: ${continent}\nis_eu_country: ${isEUCountry}\nlatitude: ${latitude}\nlongitude: ${longitude}`
+    const responseBody = request.method === 'HEAD' ? null : (locationText + '\n')
 
     return new Response(responseBody, {
       status: 200,
@@ -310,7 +385,14 @@ async function handleASNRequest(request) {
         'Content-Type': 'text/plain',
         'x-ipapp-ip': clientIP,
         'x-ipapp-ip-version': ipVersion,
-        'x-ipapp-asn': asn.toString(),
+        'x-ipapp-loc-latitude': latitude.toString(),
+        'x-ipapp-loc-longitude': longitude.toString(),
+        'x-ipapp-loc-city': city,
+        'x-ipapp-loc-region': region,
+        'x-ipapp-loc-country': country,
+        'x-ipapp-loc-postal_code': postalCode,
+        'x-ipapp-loc-continent': continent,
+        'x-ipapp-loc-is_eu_country': isEUCountry,
         ...corsHeaders,
         ...cacheBustingHeaders,
         ...documentationHeader
@@ -319,6 +401,173 @@ async function handleASNRequest(request) {
   }
 }
 
+// Handle security request
+async function handleSecurityRequest(request) {
+  // Connection security data
+  const httpProtocol = request.cf?.httpProtocol || ''
+  const tlsVersion = request.cf?.tlsVersion || ''
+  const tlsCipher = request.cf?.tlsCipher || ''
+  const clientTcpRtt = request.cf?.clientTcpRtt || ''
+
+  // Bot detection data
+  const botScore = request.cf?.botManagement?.score || '0'
+  const isVerifiedBot = request.cf?.botManagement?.verifiedBot || false
+  const botCategory = request.cf?.botManagement?.verifiedBotCategory || 'Unknown'
+
+  const wantsJson = isJsonRequested(request)
+  const clientIP = getClientIP(request)
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
+
+  if (wantsJson) {
+    const jsonResponse = {
+      http_protocol: httpProtocol,
+      tls_version: tlsVersion,
+      tls_cipher: tlsCipher,
+      tcp_rtt_ms: clientTcpRtt,
+      bot_score: botScore,
+      is_verified_bot: isVerifiedBot,
+      bot_category: botCategory
+    }
+    const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-sec-http-protocol': httpProtocol,
+        'x-ipapp-sec-tls-version': tlsVersion,
+        'x-ipapp-sec-tls-cipher': tlsCipher,
+        'x-ipapp-sec-tcp-rtt-ms': clientTcpRtt,
+        'x-ipapp-sec-bot-score': botScore.toString(),
+        'x-ipapp-sec-is-verified-bot': isVerifiedBot,
+        'x-ipapp-sec-bot-category': botCategory,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  } else {
+    // Plain text format: key: value pairs
+    const securityLines = [
+      `http_protocol: ${httpProtocol}`,
+      `tls_version: ${tlsVersion}`,
+      `tls_cipher: ${tlsCipher}`,
+      `tcp_rtt_ms: ${clientTcpRtt}`,
+      `bot_score: ${botScore}`,
+      `is_verified_bot: ${isVerifiedBot}`,
+      `bot_category: ${botCategory}`
+    ].join('\n')
+
+    const responseBody = request.method === 'HEAD' ? null : (securityLines + '\n')
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-sec-http-protocol': httpProtocol,
+        'x-ipapp-sec-tls-version': tlsVersion,
+        'x-ipapp-sec-tls-cipher': tlsCipher,
+        'x-ipapp-sec-tcp-rtt-ms': clientTcpRtt,
+        'x-ipapp-sec-bot-score': botScore.toString(),
+        'x-ipapp-sec-is-verified-bot': isVerifiedBot,
+        'x-ipapp-sec-bot-category': botCategory,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  }
+}
+
+// Handle timezone request
+async function handleTimezoneRequest(request) {
+  const timezone = request.cf?.timezone || ''
+  const wantsJson = isJsonRequested(request)
+  const clientIP = getClientIP(request)
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
+
+  if (wantsJson) {
+    const jsonResponse = timezone ? { tz: timezone } : {}
+    const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-tz': timezone,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  } else {
+    const responseBody = request.method === 'HEAD' ? null : (timezone ? timezone + '\n' : '')
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-tz': timezone,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  }
+}
+
+// Handle user-agent request
+async function handleUserAgentRequest(request) {
+  const userAgent = request.headers.get('User-Agent') || ''
+  const wantsJson = isJsonRequested(request)
+  const clientIP = getClientIP(request)
+  const ipVersion = clientIP.includes(':') ? _IP_VERSION_IPV6 : (clientIP.includes('.') ? _IP_VERSION_IPV4 : '')
+
+  if (wantsJson) {
+    const jsonResponse = {
+      ua: userAgent
+    }
+    const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-ua': userAgent,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  } else {
+    const responseBody = request.method === 'HEAD' ? null : (userAgent + '\n')
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-ua': userAgent,
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  }
+}
+
+// Primary request handler
 async function handleRequest(request) {
   const url = new URL(request.url)
 
@@ -353,7 +602,7 @@ async function handleRequest(request) {
       status: 301,
       headers: {
         'Location': 'https://github.com/fili/ip.app',
-        'Cache-Control': 'public, max-age=3600'
+        'Cache-Control': 'public, max-age=86400'
       }
     })
   }
@@ -381,14 +630,34 @@ async function handleRequest(request) {
     })
   }
 
+  // Handle /asn route
+  if (url.pathname === '/asn') {
+    return handleASNRequest(request)
+  }
+
   // Handle /headers route
   if (url.pathname === '/headers') {
     return handleHeadersRequest(request)
   }
 
-  // Handle /asn route
-  if (url.pathname === '/asn') {
-    return handleASNRequest(request)
+  // Handle /loc route
+  if (url.pathname === '/loc') {
+    return handleLocationRequest(request)
+  }
+
+  // Handle /security route
+  if (url.pathname === '/sec') {
+    return handleSecurityRequest(request)
+  }
+
+  // Handle /tz route
+  if (url.pathname === '/tz') {
+    return handleTimezoneRequest(request)
+  }
+
+  // Handle /ua route
+  if (url.pathname === '/ua') {
+    return handleUserAgentRequest(request)
   }
 
   // Handle root path (IP address)

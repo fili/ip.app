@@ -1,6 +1,6 @@
 # IP.APP API
 
-A free and easy way to check your current IP address or the HTTP headers your browser is sending.
+A free and easy way to check your current IP address and additional information the requesting client (e.g. your browser) is sending to the server. Track your or your server's public IP address and the associated ASN number, location details, timezone, as well as the user-agent or the requesting client.
 
 > Without any ads, trackers, or weird requirements.
 
@@ -9,16 +9,49 @@ In addition to the `plain/text` response, this API also supports the [JSON](#jso
 
 The API always returns the IP address as `x-ipapp-ip` and the IP version as `x-ipapp-ip-version` in the HTTP headers for all endpoints. So no matter which endpoint you use or which format you use (e.g. [JSON](#json) or `plain/text`) or which request method you use (e.g. [HEAD](https://http.dev/head?utm_source=ip.app) or [GET](https://http.dev/get?utm_source=ip.app) or [POST](https://http.dev/post?utm_source=ip.app)), you will always have the IP address and version available in the [HTTP headers](https://http.dev/headers?utm_source=ip.app).
 
-## Endpoints
+## Table of Contents
+
+- [Available Endpoints](#available-endpoints)
+- [HTTP Methods](#http-methods)
+- [Usage](#usage)
+  - [Endpoint: IP address](#endpoint-ip-address)
+  - [Endpoint: HTTP headers](#endpoint-http-headers)
+  - [Endpoint: ASN](#endpoint-asn)
+  - [Endpoint: Location](#endpoint-location)
+  - [Endpoint: Security (incl. bot detection)](#endpoint-security-incl-bot-detection)
+  - [Endpoint: Timezone](#endpoint-timezone)
+  - [Endpoint: User-Agent](#endpoint-user-agent)
+- [JSON](#json)
+  - [JSON Response Fields](#json-response-fields)
+  - [JSON Examples](#json-examples)
+- [x-ipapp-ip HTTP Header](#x-ipapp-ip-http-header)
+- [x-ipapp-ip-version HTTP Header](#x-ipapp-ip-version-http-header)
+- [Status Codes](#status-codes)
+- [Other Accepted Paths](#other-accepted-paths)
+- [Rate Limiting](#rate-limiting)
+- [Geographic Restrictions](#geographic-restrictions)
+- [Changelog](#changelog)
+- [Ideas / Questions / Suggestions](#ideas--questions--suggestions)
+- [Sponsoring](#sponsoring)
+- [Credits](#credits)
+- [License](#license)
+- [Disclaimer](#disclaimer)
+
+## Available Endpoints
 
 The API accepts requests to the following paths:
 
 | Path | Name | Description |
 |------|------|-------------|
-| `/` | IP address | Endpoint for returning the current IP address |
-| `/headers` |  HTTP headers | Endpoint for returning HTTP headers the client sent to the server |
-| `/asn` | ASN | Endpoint for returning the ASN of the current IP address |
+| [`/`](#endpoint-ip-address) | IP address | Endpoint for returning the current IP address |
+| [`/asn`](#endpoint-asn) | ASN | Endpoint for returning the ASN of the current IP address |
+| [`/headers`](#endpoint-http-headers) |  HTTP headers | Endpoint for returning HTTP headers the client sent to the server |
+| [`/loc`](#endpoint-location) | Location | Endpoint for returning the location of the current IP address |
+| [`/sec`](#endpoint-security-incl-bot-detection) | Security | Endpoint for returning the security information of the current IP address (incl. bot detection) |
+| [`/tz`](#endpoint-timezone) | Timezone | Endpoint for returning the timezone of the current IP address |
+| [`/ua`](#endpoint-user-agent) | User-Agent | Endpoint for returning the User-Agent of the current IP address |
 
+## HTTP Methods
 
 The API endpoints supports the following [HTTP methods](https://http.dev/methods?utm_source=ip.app):
 - [GET](https://http.dev/get?utm_source=ip.app)
@@ -141,28 +174,87 @@ requests.post('https://ip.app').text.strip()
 
 No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned.
 
+#### Response Values
+
+The API endpoint `/` returns one of the following response values across all formats (`plain text`, [JSON](#getting-the-ip-address-in-json-format), and [HTTP header](#x-ipapp-ip-http-header)):
+
+- **String**: The detected public IP address in IPv4 format (e.g., `1.1.1.1`) or IPv6 format (e.g., `2001:db8::1`).
+- **Empty Response**: Returned as a fallback when no IP address is detected.
+
+The API endpoint `/` will also return in [JSON](#getting-the-ip-address-in-json-format), and [HTTP header](#x-ipapp-ip-http-header) the following response values:
+
+- **IP Version**: The version of the detected IP address, e.g. `4` or `6` or empty string.
+
+
+### Endpoint: ASN
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the ASN associated with the current IP address.
+
+#### GET
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body.
+
 ##### cURL
 
 ```bash
-curl -sI ip.app | grep -i "x-ipapp-ip" | cut -d' ' -f2
+curl ip.app/asn
 ```
 
 ##### Python
 
 ```python
-requests.head('https://ip.app').headers.get('x-ipapp-ip', 'Unknown')
+requests.get('https://ip.app/asn').text
+```
+
+##### wget
+
+```bash
+wget -qO- ip.app/asn
+```
+
+#### POST
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
+
+##### cURL
+
+```bash
+curl -X POST ip.app/asn
+```
+
+##### Python
+
+```python
+requests.post('https://ip.app/asn').text
+```
+
+#### HEAD
+
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned. All HTTP headers sent by the requesting client (e.g. your browser) are returned alongside the HTTP server response headers, however the names of the client's HTTP headers start with `x-ipapp-`.
+
+##### cURL
+
+Read the ASN in HEAD response and extract only the request headers:
+
+```bash
+curl -sI ip.app/asn | grep -i "x-ipapp-asn"
+```
+
+##### Python
+
+Read the ASN in HEAD response, extract only the relevant request headers:
+
+```python
+requests.head('https://ip.app/asn').headers.get('x-ipapp-asn', '')
 ```
 
 #### Response Values
 
-The API endpoint `/` returns one of the following response values across all formats (`plain text`, [JSON](#getting-the-ip-address-in-json-format), and [HTTP header](#x-ipapp-ip-http-header)):
+The API endpoint `/asn` returns one of the following response values across the formats `plain text` and [JSON](#json):
 
-- **IP Address**: The detected public IP address in IPv4 format (e.g., `1.1.1.1`) or IPv6 format (e.g., `2001:db8::1`).
-- **Unknown**: Returned as a fallback when no IP address is detected.
+- **String**: representing the ASN associated with the current IP address. Where the key is the ASN number, starting with `AS` and the value is the ASN organization name (if available), separated by a colon and a space `: `.
+- **Empty Response**: An empty response or `{}` as no ASN was found.
 
-The API endpoint `/` will also return in [JSON](#getting-the-ip-address-in-json-format), and [HTTP header](#x-ipapp-ip-http-header) the following response values:
-
-- **IP Version**: The version of the detected IP address, e.g. `ipv4` or `ipv6` or empty string.
 
 ### Endpoint: HTTP headers
 
@@ -234,7 +326,7 @@ Read the HTTP headers in HEAD response, extract only the request headers and rem
 response = requests.head('https://ip.app/headers')
 for key, value in response.headers.items():
     if key.lower().startswith('x-ipapp-header-'):
-        clean_key = key[8:]  # Remove 'x-ipapp-header-' prefix
+        clean_key = key[15:]  # Remove 'x-ipapp-header-' prefix
         print(f"{clean_key}: {value}")
 ```
 
@@ -251,9 +343,10 @@ The API endpoint `/headers` returns one of the following response values across 
 - **Key: Value pairs**: representing the HTTP headers the requesting client sent to the server.
 - **Empty Response**: An empty response or `{}` as no headers were sent.
 
-### Endpoint: ASN
 
-The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the ASN of the current IP address.
+### Endpoint: Location
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the location information associated with the current IP address.
 
 #### GET
 
@@ -262,19 +355,19 @@ Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-form
 ##### cURL
 
 ```bash
-curl ip.app/asn
+curl ip.app/loc
 ```
 
 ##### Python
 
 ```python
-requests.get('https://ip.app/asn').text
+requests.get('https://ip.app/loc').text
 ```
 
 ##### wget
 
 ```bash
-wget -qO- ip.app/asn
+wget -qO- ip.app/loc
 ```
 
 #### POST
@@ -284,13 +377,13 @@ Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-form
 ##### cURL
 
 ```bash
-curl -X POST ip.app/asn
+curl -X POST ip.app/loc
 ```
 
 ##### Python
 
 ```python
-requests.post('https://ip.app/asn').text
+requests.post('https://ip.app/loc').text
 ```
 
 #### HEAD
@@ -302,29 +395,264 @@ No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?
 Read the ASN in HEAD response and extract only the request headers:
 
 ```bash
-curl -sI ip.app/asn | grep -i "x-ipapp-asn"
+curl -sI ip.app/loc | grep -i "x-ipapp-loc"
 ```
 
-Removing the `x-ipapp-asn-` prefix:
+Removing the `x-ipapp-loc-` prefix:
 
 ```bash
-curl -sI ip.app/asn | grep -i "x-ipapp-asn-" | sed 's/x-ipapp-asn-//i'
+curl -sI ip.app/loc | grep -i "x-ipapp-loc-" | sed 's/x-ipapp-loc-//i'
 ```
 
 ##### Python
 
-Read the ASN in HEAD response, extract only the relevant request headers:
+Read the location in HEAD response, extract only the request headers and removing the `x-ipapp-loc-` prefix:
 
 ```python
-requests.head('https://ip.app/asn').headers.get('x-ipapp-asn', '')
+response = requests.head('https://ip.app/loc')
+for key, value in response.headers.items():
+    if key.lower().startswith('x-ipapp-loc-'):
+        clean_key = key[12:]  # Remove 'x-ipapp-loc-' prefix
+        print(f"{clean_key}: {value}")
+```
+
+One-liner:
+
+```python
+{k[12:]: v for k, v in requests.head('https://ip.app/loc').headers.items() if k.lower().startswith('x-ipapp-loc-')}
 ```
 
 #### Response Values
 
-The API endpoint `/asn` returns one of the following response values across the formats `plain text` and [JSON](#json):
+The API endpoint `/loc` returns one of the following response values across the formats `plain text` and [JSON](#json):
 
-- **Key: Value pairs**: representing the ASN of the current IP address. Where the key is the ASN number, starting with `AS` and the value is the ASN organization name, separated by a colon and a space `: `.
-- **Empty Response**: An empty response or `{}` as no ASN was found.
+- **Key: Value pairs**: representing the location associated with the current IP address.
+- **Empty Response**: An empty response or `{}` as no location was found.
+
+
+### Endpoint: Security (incl. bot detection)
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the security information associated with the current IP address and user-agent. The bot score (default = 0, range = 1-100, higher = more human), whether the user-agent is a verified bot, and the bot category (if applicable), is extracted from the Cloudflare bot detection system based on the information sent by the requesting client to the server. The remaining security information includes the HTTP protocol, TLS version, TLS cipher and TCP RTT (round trip time in milliseconds) detected by the server for establishing the connection.
+
+#### GET
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body.
+
+##### cURL
+
+```bash
+curl ip.app/sec
+```
+
+##### Python
+
+```python
+requests.get('https://ip.app/sec').text
+```
+
+##### wget
+
+```bash
+wget -qO- ip.app/sec
+```
+
+#### POST
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
+
+##### cURL
+
+```bash
+curl -X POST ip.app/sec
+```
+
+##### Python
+
+```python
+requests.post('https://ip.app/sec').text
+```
+
+#### HEAD
+
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned. All HTTP headers sent by the requesting client (e.g. your browser) are returned alongside the HTTP server response headers, however the names of the client's HTTP headers start with `x-ipapp-`.
+
+##### cURL
+
+Read the security information in HEAD response and extract only the request headers:
+
+```bash
+curl -sI ip.app/sec | grep -i "x-ipapp-sec"
+```
+
+Removing the `x-ipapp-sec-` prefix:
+
+```bash
+curl -sI ip.app/sec | grep -i "x-ipapp-sec-" | sed 's/x-ipapp-sec-//i'
+```
+
+##### Python
+
+Read the security information in HEAD response, extract only the request headers and removing the `x-ipapp-sec-` prefix:
+
+```python
+response = requests.head('https://ip.app/sec')
+for key, value in response.headers.items():
+    if key.lower().startswith('x-ipapp-sec-'):
+        clean_key = key[12:]  # Remove 'x-ipapp-sec-' prefix
+        print(f"{clean_key}: {value}")
+```
+
+One-liner:
+
+```python
+{k[12:]: v for k, v in requests.head('https://ip.app/sec').headers.items() if k.lower().startswith('x-ipapp-sec-')}
+```
+
+#### Response Values
+
+The API endpoint `/sec` returns one of the following response values across the formats `plain text` and [JSON](#json):
+
+- **Key: Value pairs**: representing the security information associated with the current IP address and user-agent.
+- **Empty Response**: An empty response or `{}` as no security information was found.
+
+
+### Endpoint: Timezone
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the timezone associated with the current IP address.
+
+#### GET
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body.
+
+##### cURL
+
+```bash
+curl ip.app/tz
+```
+
+##### Python
+
+```python
+requests.get('https://ip.app/tz').text
+```
+
+##### wget
+
+```bash
+wget -qO- ip.app/tz
+```
+
+#### POST
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
+
+##### cURL
+
+```bash
+curl -X POST ip.app/tz
+```
+
+##### Python
+
+```python
+requests.post('https://ip.app/tz').text
+```
+
+#### HEAD
+
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned. All HTTP headers sent by the requesting client (e.g. your browser) are returned alongside the HTTP server response headers, however the names of the client's HTTP headers start with `x-ipapp-`.
+
+##### cURL
+
+Read the ASN in HEAD response and extract only the request headers:
+
+```bash
+curl -sI ip.app/tz | grep -i "x-ipapp-tz"
+```
+
+##### Python
+
+Read the timezone in HEAD response, extract only the relevant request headers:
+
+```python
+requests.head('https://ip.app/tz').headers.get('x-ipapp-tz', '')
+```
+
+#### Response Values
+
+The API endpoint `/tz` returns one of the following response values across the formats `plain text` and [JSON](#json):
+
+- **String**: representing the timezone associated with the current IP address.
+- **Empty Response**: An empty response or `{}` as no timezone was found.
+
+
+### Endpoint: User-Agent
+
+The following [cURL](https://curl.se) and [Python](https://python.org) (using the [requests](https://requests.readthedocs.io) library) examples will return the User-Agent of the current IP address.
+#### GET
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body.
+
+##### cURL
+
+```bash
+curl ip.app/ua
+```
+
+##### Python
+
+```python
+requests.get('https://ip.app/ua').text
+```
+
+##### wget
+
+```bash
+wget -qO- ip.app/ua
+```
+
+#### POST
+
+Returns `plain text` or [JSON](#getting-the-requesting-http-headers-in-json-format) in HTTP response body. Any [POST](https://http.dev/post?utm_source=ip.app) data submitted is ignored and disregarded.
+
+##### cURL
+
+```bash
+curl -X POST ip.app/ua
+```
+
+##### Python
+
+```python
+requests.post('https://ip.app/ua').text
+```
+
+#### HEAD
+
+No HTTP response body is returned, only [HTTP headers](https://http.dev/headers?utm_source=ip.app) are returned. All HTTP headers sent by the requesting client (e.g. your browser) are returned alongside the HTTP server response headers, however the names of the client's HTTP headers start with `x-ipapp-`.
+
+##### cURL
+
+Read the ASN in HEAD response and extract only the request headers:
+
+```bash
+curl -sI ip.app/ua | grep -i "x-ipapp-ua"
+```
+
+##### Python
+
+Read the timezone in HEAD response, extract only the relevant request headers:
+
+```python
+requests.head('https://ip.app/ua').headers.get('x-ipapp-ua', '')
+```
+
+#### Response Values
+
+The API endpoint `/ua` returns one of the following response values across the formats `plain text` and [JSON](#json):
+
+- **String**: representing the User-Agent of the current IP address.
+- **Empty Response**: An empty response or `{}` as no User-Agent was found.
 
 
 ## JSON
@@ -348,7 +676,7 @@ The HTTP response body for the endpoint `/` will be like:
 ```json
 {
   "ip": "1.1.1.1",
-  "ip_version": "ipv4"
+  "ip_version": "4"
 }
 ```
 
@@ -388,7 +716,7 @@ Here is a response example from cURL:
 
 More information on [HTTP Headers](https://http.dev/headers?utm_source=ip.app) sent by the requesting client.
 
-### JSON examples
+### JSON Examples
 
 Try the following examples:
 
@@ -478,7 +806,7 @@ For examples, check out the [HEAD](#head-1) examples under [Usage](#endpoint-ip-
 
 ## x-ipapp-ip-version HTTP Header
 
-The API returns with every HTTP request a `x-ipapp-ip-version` HTTP header, which returns the version of the detected public IP address of the requesting client  and is either `ipv4` or `ipv6`, or `''` (an empty string) when no valid IP address is detected.
+The API returns with every HTTP request a `x-ipapp-ip-version` HTTP header, which returns the version of the detected public IP address of the requesting client  and is either `4` or `6`, or `''` (an empty string) when no valid IP address is detected.
 
 Since the IP address version is included in the [HTTP header](https://http.dev/headers?utm_source=ip.app), response, it can be efficiently retrieved using just a [HEAD](https://http.dev/head?utm_source=ip.app) request without needing to download the response body. This makes it particularly useful for applications that want to avoid the overhead of initiating a [GET](https://http.dev/get?utm_source=ip.app) request and downloading and reading the HTTP response body.
 
@@ -517,6 +845,16 @@ Rate limiting is enabled to ensure fair usage of the API. Requests exceeding the
 Certain countries are blocked from using this API due to historic abuse patterns. Users from these countries will not be able to access the service.
 
 ## Changelog
+
+### 2025-07-08
+
+- **New endpoint `/asn`**: Added a new endpoint which returns the ASN associated with the current IP address.
+- **New endpoint `/loc`**: Added a new endpoint which returns the location associated with the current IP address.
+- **New endpoint `/sec`**: Added a new endpoint which returns security information about the established connection between the requesting client and the server, as well as including bot detection information such as bot score, bot category and whether the user-agent is a verified bot. The latter is based on Cloudflare's bot detection system.
+- **New endpoint `/tz`**: Added a new endpoint which returns the timezone associated with the current IP address.
+- **New endpoint `/ua`**: Added a new endpoint which returns the User-Agent of the requesting client (e.g. your browser).
+- **Fixed documentation**: Updated a number documentation errors and typos and restructured the documentation.
+- **Breaking change**: Renamed the IP version values from `ipv4` to `4` and `ipv6` to `6`.
 
 ### 2025-07-03
 
