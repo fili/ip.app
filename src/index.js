@@ -269,6 +269,52 @@ async function handleHeadersRequest(request) {
   }
 }
 
+// Handle ASN request
+async function handleASNRequest(request) {
+  const asn = request.cf?.asn || 'Unknown'
+  const asOrganization = request.cf?.asOrganization || 'Unknown'
+  const wantsJson = isJsonRequested(request)
+  const clientIP = getClientIP(request)
+  const ipVersion = clientIP.includes(':') ? 'ipv6' : (clientIP.includes('.') ? 'ipv4' : '')
+
+  if (wantsJson) {
+    const jsonResponse = {
+      asn: asn,
+      organization: asOrganization
+    }
+    const responseBody = request.method === 'HEAD' ? null : JSON.stringify(jsonResponse) + '\n'
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-asn': asn.toString(),
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  } else {
+    const asnText = `AS${asn} ${asOrganization}`
+    const responseBody = request.method === 'HEAD' ? null : (asnText + '\n')
+
+    return new Response(responseBody, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'x-ipapp-ip': clientIP,
+        'x-ipapp-ip-version': ipVersion,
+        'x-ipapp-asn': asn.toString(),
+        ...corsHeaders,
+        ...cacheBustingHeaders,
+        ...documentationHeader
+      }
+    })
+  }
+}
+
 async function handleRequest(request) {
   const url = new URL(request.url)
 
@@ -334,6 +380,11 @@ async function handleRequest(request) {
   // Handle /headers route
   if (url.pathname === '/headers') {
     return handleHeadersRequest(request)
+  }
+
+  // Handle /asn route
+  if (url.pathname === '/asn') {
+    return handleASNRequest(request)
   }
 
   // Handle root path (IP address)
