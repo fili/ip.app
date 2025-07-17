@@ -26,6 +26,7 @@ The API always returns the IP address as `x-ipapp-ip` and the IP version as `x-i
   - [JSON Examples](#json-examples)
 - [x-ipapp-ip HTTP Header](#x-ipapp-ip-http-header)
 - [x-ipapp-ip-version HTTP Header](#x-ipapp-ip-version-http-header)
+- [Python Package](#python-package)
 - [Status Codes](#status-codes)
 - [Other Accepted Paths](#other-accepted-paths)
 - [Rate Limiting](#rate-limiting)
@@ -812,6 +813,32 @@ Since the IP address version is included in the [HTTP header](https://http.dev/h
 
 For examples, check out the [HEAD](#head-1) examples under [Usage](#endpoint-ip-address).
 
+
+## Python Package
+
+For Python users, we provide a convenient package available on PyPI that wraps the IP.APP API:
+
+**Installation:**
+
+```bash
+pip install ipapp
+```
+
+**Usage:**
+
+```python
+import ipapp
+
+# Get your IP address
+ip = ipapp.get_ip()
+print(ip)
+```
+
+**Package Details:**
+- PyPI: https://pypi.org/project/ipapp/
+- Simple and lightweight wrapper around the IP.APP API
+
+
 ## Status Codes
 
 The API returns the following [HTTP status codes](https://http.dev/status?utm_source=ip.app):
@@ -823,6 +850,7 @@ The API returns the following [HTTP status codes](https://http.dev/status?utm_so
 | [`404`](https://http.dev/404?utm_source=ip.app) | Not found - invalid endpoint |
 | [`429`](https://http.dev/429?utm_source=ip.app) | Too many requests - rate limiting applied |
 | `1015` | Rate limiting - requests blocked due to rate limits |
+
 
 ## Other Accepted Paths
 
@@ -836,15 +864,22 @@ The API accepts requests to the following paths:
 
 All other paths return a [404 status code](https://http.dev/404?utm_source=ip.app).
 
+
 ## Rate Limiting
 
 Rate limiting is enabled to ensure fair usage of the API. Requests exceeding the rate limit will receive a `429` or `1015` status code response.
+
 
 ## Geographic Restrictions
 
 Certain countries are blocked from using this API due to historic abuse patterns. Users from these countries will not be able to access the service.
 
+
 ## Changelog
+
+### 2025-07-17
+
+- **New Python Package**: The IP.app API now has a dedicated Python Package (without dependencies on third party libraries) available on [PyPI](https://pypi.org/project/ipapp/).
 
 ### 2025-07-08
 
@@ -869,13 +904,16 @@ Certain countries are blocked from using this API due to historic abuse patterns
 
 Important news and/or status updates will also be announced on BlueSky: [@ip.app](https://bsky.app/profile/ip.app)
 
+
 ## Ideas / Questions / Suggestions
 
 Thank you for your enthusiasm, please create an [issue](https://github.com/fili/ip.app/issues/new) in this repository.
 
+
 ## Sponsoring
 
 If you find this API useful and like to assist paying for domain renewal and data traffic costs, please consider [sponsering this API](https://github.com/sponsors/fili).
+
 
 ## Credits
 
@@ -883,9 +921,12 @@ This API is inspired by [icanhazip](https://icanhazip.com), which operates in a 
 
 Especially getting the information using the [HEAD](#x-ipapp-ip-http-header) method is the primary reason why this API was launched. None of the other many alternatives found support the [HEAD](https://http.dev/head?utm_source=ip.app) method either.
 
+
 ## License
+
 - Code: MIT License
 - Favicon (decoded): CC0 Public Domain
+
 
 ## Disclaimer
 
