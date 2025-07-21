@@ -816,7 +816,7 @@ For examples, check out the [HEAD](#head-1) examples under [Usage](#endpoint-ip-
 
 ## Python Package
 
-For Python users, a convenient package on PyPI is available that wraps the IP.APP API:
+For Python users, a convenient [package](https://github.com/fili/ipapp-python) on [PyPI](https://pypi.org/project/ipapp/) is available that wraps the IP.APP API:
 
 **Installation:**
 
